@@ -9,6 +9,8 @@
 //!   Enables the tokio runtime and re-exports it under the name `default`.
 //! - `default-async-std`
 //!   Enables the async-std runtime and re-exports it under the name `default`.
+//! - `default-glommio`
+//!   Enables the glommio runtime and re-exports it under the name `default`.
 //! - `default-disabled`
 //!   Prevents a default runtime being exported, regardless of other features.
 //!
@@ -27,6 +29,9 @@ pub mod tokio;
 #[cfg(feature = "async-std")]
 pub mod async_std;
 
+#[cfg(feature = "glommio")]
+pub mod glommio;
+
 pub mod panic;
 
 #[cfg(all(feature = "default-tokio", not(feature = "default-disabled")))]
@@ -35,9 +40,13 @@ pub use self::tokio as default;
 #[cfg(all(feature = "default-async-std", not(feature = "default-disabled")))]
 pub use self::async_std as default;
 
+#[cfg(all(feature = "default-glommio", not(feature = "default-disabled")))]
+pub use self::glommio as default;
+
 #[cfg(not(any(
     feature = "default-tokio",
     feature = "default-async-std",
+    feature = "default-glommio",
     feature = "default-disabled"
 )))]
 pub use self::panic as default;

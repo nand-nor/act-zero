@@ -194,9 +194,12 @@ impl<T: Actor + ?Sized> AsAddr for crate::WeakAddr<T> {
 /// macro.
 pub struct Addr<T: ?Sized + 'static> {
     inner: Option<Arc<dyn Any + Send + Sync>>,
-    send_mut: &'static (dyn Fn(&Arc<dyn Any + Send + Sync>, MutItem<T>) + Send + Sync),
-    send_fut: &'static (dyn Fn(&Arc<dyn Any + Send + Sync>, FutItem) + Send + Sync),
+    send_mut: SendMut<T>,
+    send_fut: SendFut,
 }
+
+type SendMut<T> = &'static (dyn Fn(&Arc<dyn Any + Send + Sync>, MutItem<T>) + Send + Sync);
+type SendFut = &'static (dyn Fn(&Arc<dyn Any + Send + Sync>, FutItem) + Send + Sync);
 
 impl<T: ?Sized> Debug for Addr<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -366,8 +369,8 @@ impl<T: ?Sized + Send + 'static> Addr<T> {
 /// macro.
 pub struct WeakAddr<T: ?Sized + 'static> {
     inner: Option<Weak<dyn Any + Send + Sync>>,
-    send_mut: &'static (dyn Fn(&Arc<dyn Any + Send + Sync>, MutItem<T>) + Send + Sync),
-    send_fut: &'static (dyn Fn(&Arc<dyn Any + Send + Sync>, FutItem) + Send + Sync),
+    send_mut: SendMut<T>,
+    send_fut: SendFut,
 }
 
 impl<T: ?Sized> Clone for WeakAddr<T> {

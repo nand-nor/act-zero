@@ -65,6 +65,7 @@ mod utils;
 
 pub use actor::*;
 pub use addr::*;
+#[allow(unused)]
 pub use macros::*;
 pub use utils::*;
 

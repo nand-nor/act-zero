@@ -38,8 +38,30 @@ async fn main() -> Result<(), ActorError> {
     run_example().await
 }
 
+// Glommio does not support async main
+#[cfg(all(
+    feature = "default-glommio",
+    not(any(
+        feature = "default-disabled",
+        feature = "default-tokio",
+        feature = "default-async-std"
+    ))
+))]
+fn main() {
+    // pin actor to core 0
+    let handle = glommio::LocalExecutorBuilder::new(glommio::Placement::Fixed(0))
+        .name(&format!("{}{}", "actor-rt-handle", 0))
+        .spawn(move || async move { run_example().await })
+        .unwrap();
+    handle.join().unwrap();
+}
+
 #[cfg(not(all(
-    any(feature = "default-tokio", feature = "default-async-std"),
+    any(
+        feature = "default-tokio",
+        feature = "default-async-std",
+        feature = "default-glommio"
+    ),
     not(feature = "default-disabled")
 )))]
 fn main() {
